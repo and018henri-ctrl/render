@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A&M Produções | Área do Cliente</title>
+    
+    <script>
+        // --- 1. Bloqueios Básicos (Teclado e Mouse) ---
+        
+        // Desabilita menu de contexto (Botão Direito / Long Press no celular)
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Bloqueia atalhos de teclado (apenas desktop)
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123) return false; // F12
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Ctrl+Shift+C
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
+        }
+
+        // --- 2. Proteção Avançada (Debugger) ---
+        // Isso irrita quem tentar abrir o inspetor, pausando o código repetidamente
+        !function() {
+            function detectDevTool(allow) {
+                if (isNaN(+allow)) allow = 100;
+                var start = +new Date();
+                debugger; // Pausa se o inspetor estiver aberto
+                var end = +new Date();
+                if (isNaN(start) || isNaN(end) || end - start > allow) {
+                    // Se houver atraso na execução (sinal de inspeção ativa)
+                    document.body.innerHTML = '<div style="background:black;color:red;height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;font-family:sans-serif;"><h1>Acesso Negado</h1><p>Inspeção detectada.</p></div>';
+                }
+            }
+            if (window.attachEvent) {
+                if (document.readyState === "complete" || document.readyState === "interactive") {
+                    detectDevTool();
+                    window.attachEvent('onresize', detectDevTool);
+                    window.attachEvent('onmousemove', detectDevTool);
+                    window.attachEvent('onfocus', detectDevTool);
+                    window.attachEvent('onblur', detectDevTool);
+                } else {
+                    setTimeout(argument.callee, 0);
+                }
+            } else {
+                window.addEventListener('load', detectDevTool);
+                window.addEventListener('resize', detectDevTool);
+                window.addEventListener('mousemove', detectDevTool);
+                window.addEventListener('focus', detectDevTool);
+                window.addEventListener('blur', detectDevTool);
+            }
+        }();
+
+        // --- 3. Detecção de Tamanho de Tela (APENAS PARA PC) ---
+        // O erro no iPhone estava AQUI. Adicionamos uma verificação para pular isso se for celular.
+        setInterval(function() {
+            // Verifica se é dispositivo móvel (iPhone, Android, iPad)
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            
+            // SE FOR MOBILE, NÃO FAZ A VERIFICAÇÃO DE TAMANHO (evita o bloqueio falso)
+            if (isMobile) return; 
+
+            // Lógica para PC (Desktop)
+            const threshold = 160;
+            const widthDiff = window.outerWidth - window.innerWidth > threshold;
+            const heightDiff = window.outerHeight - window.innerHeight > threshold;
+            
+            if (widthDiff || heightDiff) {
+                document.body.innerHTML = '<div style="background:black;color:red;height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;font-family:sans-serif;"><h1>Acesso Bloqueado</h1><p>Feche o inspetor para continuar.</p></div>';
+            }
+        }, 1000);
+    </script>
+    <link rel="preconnect" href="https://drive.google.com">
+    <link rel="preconnect" href="https://content.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://drive.google.com">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide.js"></script>
+    
+    <script src="https://player.vimeo.com/api/player.js" async></script>
+    <script src="https://www.youtube.com/iframe_api" async></script>
+    
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
+    <style>
+        /* --- ESTILOS GERAIS --- */
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f1f5f9; scroll-behavior: smooth; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #334155; border-radius: 10px; }
+
+        /* --- ANIMAÇÕES --- */
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .animate-marquee { display: flex; width: max-content; animation: marquee 60s linear infinite; }
+        .animate-marquee:hover { animation-play-state: paused; }
+        @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        .animate-pulse-border { animation: pulse-border 2s infinite; }
+        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes bounce-emoji { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+        .animate-emoji { animation: bounce-emoji 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* --- COMPONENTES --- */
+        .carousel-container { position: relative; width: 100%; height: 60vh; overflow: hidden; background-color: #000; }
+        @media (min-width: 768px) { .carousel-container { height: 75vh; } }
+        .carousel-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1s ease-in-out; z-index: 1; display: flex; align-items: center; justify-content: center; }
+        .carousel-slide.active { opacity: 1; z-index: 2; }
+        .carousel-slide img, .carousel-slide video { width: 100%; height: 100%; object-fit: cover; }
+        .carousel-dots { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .carousel-dot { width: 10px; height: 10px; border-radius: 50%; background-color: rgba(255, 255, 255, 0.3); cursor: pointer; transition: all 0.3s; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .carousel-dot.active { background-color: white; transform: scale(1.3); border-color: white; }
+
+        /* --- ESTILIZAÇÃO DOS CARDS --- */
+        .card-video-styled {
+            width: 100%;
+            background: #0d1524;
+            border-radius: 16px;
+            border: 1px solid #1e2536;
+            overflow: hidden;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            contain: content;
+        }
+
+        .video-container-styled {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 */
+            background: black;
+            min-height: 270px;
+        }
+
+        .video-container-styled iframe,
+        .video-container-styled video,
+        .video-container-styled img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .status-container { display: flex; justify-content: center; }
+        .status-styled { display: inline-block; background: #1f2a3b; color: #d3d6de; padding: 6px 14px; font-size: 13px; border-radius: 20px; margin: 12px; font-weight: bold; text-transform: uppercase; }
+        .buttons-styled { width: 100%; display: flex; gap: 10px; padding: 0 14px; margin-top: 5px; }
+        .btn-styled { flex: 1; padding: 14px 0; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; transition: opacity 0.2s; font-weight: 500; }
+        .btn-styled:hover { opacity: 0.9; }
+        .btn-ajuste { background: #232b38; color: white; }
+        .btn-aprovar { background: #00b84d; color: white; font-weight: bold; }
+        .btn-undo-styled { background: transparent; color: #94a3b8; text-decoration: underline; font-size: 14px; padding: 10px; width: 100%; text-align: center; }
+
+        @media (max-width: 480px) { .video-container-styled { min-height: 240px; } }
+
+        /* --- ESTILIZAÇÃO DO PLAYER NO MODAL --- */
+        #ajuste-player-container iframe, #ajuste-player-container video { width: 100%; height: 100%; border: none; display: block; }
+
+        /* Mobile Modal Adjustments */
+        @media (max-width: 768px) {
+            #video-ajuste-modal { padding: 0 !important; }
+            #video-ajuste-modal > div { border-radius: 0 !important; height: 100vh !important; width: 100vw !important; max-width: 100vw !important; display: flex !important; flex-direction: column !important; background-color: #111827; }
+            #ajuste-video-section { display: flex !important; width: 100% !important; margin: 0 !important; height: 35vh !important; min-height: 250px; background-color: black; flex-shrink: 0; border-radius: 0 !important; overflow: hidden; z-index: 50; position: relative; }
+            #ajuste-video-section.hidden-mobile-video { display: none !important; }
+            #ajuste-video-section .absolute.bottom-0 { display: none !important; }
+            #ajuste-sidebar-section { width: 100% !important; height: auto !important; flex-grow: 1; border-left: none; border-top: 1px solid #374151; overflow-y: auto; }
+            #ajuste-player-container { position: relative !important; width: 100% !important; height: 100% !important; display: flex !important; align-items: center; justify-content: center; z-index: 10; }
+            #ajuste-player-container iframe, #ajuste-player-container video { width: 100% !important; height: 100% !important; object-fit: contain; border: none !important; z-index: 20; background-color: #000; }
+        }
+        @media (min-width: 769px) {
+            #ajuste-video-section { width: 66.66% !important; height: 100% !important; display: flex !important; }
+            #ajuste-sidebar-section { width: 33.33% !important; height: 100% !important; border-left: 1px solid #374151; border-top: none; }
+        }
+
+        .toggle-password-button .eye-open, .toggle-password-button.toggled .eye-closed { display: block; }
+        .toggle-password-button .eye-closed, .toggle-password-button.toggled .eye-open { display: none; }
+        .notification-badge { position: absolute; top: -2px; right: -6px; z-index: 101; background-color: #ef4444; color: white; font-size: 0.65rem; font-weight: 800; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        /* Chat Styles */
+        .chat-modal { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100; width: 360px; height: 500px; max-width: calc(100vw - 3rem); max-height: 75vh; background-color: #1e293b; border-radius: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #334155; }
+        @media (max-width: 450px) { .chat-modal { width: 100vw; height: 100vh; max-width: 100vw; max-height: 100vh; bottom: 0; right: 0; border-radius: 0; } }
+        .chat-bubble { padding: 0.75rem 1rem; border-radius: 1.25rem; max-width: 85%; word-wrap: break-word; font-size: 0.9rem; line-height: 1.5; margin-bottom: 0.5rem; position: relative; }
+        .chat-bubble-client { background-color: #3b82f6; color: white; align-self: flex-end; border-bottom-right-radius: 0.25rem; margin-left: auto; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2); }
+        .chat-bubble-admin { background-color: #334155; color: #f1f5f9; align-self: flex-start; border-bottom-left-radius: 0.25rem; margin-right: auto; border: 1px solid #475569; }
+        .chat-bubble-system { background-color: rgba(15, 23, 42, 0.6); color: #94a3b8; font-size: 0.75rem; text-align: center; align-self: center; width: auto; padding: 0.25rem 0.75rem; border-radius: 99px; margin: 0.75rem 0; backdrop-filter: blur(4px); }
+
+        .folder-list-item { display: flex; align-items: center; background-color: #1e293b; border: 1px solid #334155; border-radius: 0.75rem; padding: 1rem; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.2s ease; }
+        .folder-list-item:hover { background-color: #334155; border-color: #475569; transform: translateX(4px); }
+        .folder-icon-container { flex-shrink: 0; width: 3.5rem; height: 3.5rem; background-color: #0f172a; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; margin-right: 1rem; color: #f59e0b; }
+        .folder-info { flex-grow: 1; min-width: 0; }
+        .folder-title { font-weight: 700; color: #f1f5f9; font-size: 1.125rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .folder-meta { font-size: 0.875rem; color: #94a3b8; margin-top: 0.125rem; display: flex; align-items: center; gap: 0.75rem; }
+        .folder-arrow { color: #64748b; transition: transform 0.2s; }
+        .folder-list-item:hover .folder-arrow { color: #94a3b8; transform: translateX(2px); }
+
+        .subfolder-card { background-color: #1e293b; border: 1px solid #334155; border-radius: 1rem; padding: 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; transition: all 0.3s ease; aspect-ratio: 4/3; }
+        .subfolder-card:hover { background-color: #334155; border-color: #60a5fa; transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3); }
+        .subfolder-icon { width: 4rem; height: 4rem; color: #a78bfa; margin-bottom: 1rem; transition: transform 0.3s; }
+        .subfolder-card:hover .subfolder-icon { transform: scale(1.1); color: #c4b5fd; }
+        .subfolder-name { font-weight: 700; font-size: 1.1rem; color: white; margin-bottom: 0.25rem; }
+        .subfolder-count { font-size: 0.8rem; color: #94a3b8; }
+
+        /* --- PERSONALIZAÇÃO DO PLAYER (PLYR) --- */
+        :root { --plyr-color-main: #2563eb; }
+        .plyr--video { border-radius: 12px; overflow: hidden; }
+        .plyr__control--overlaid { background: rgba(37, 99, 235, 0.8); }
+        .plyr__control:hover { background: #1d4ed8; }
+
+        /* --- BOTÃO DE DOWNLOAD --- */
+        .btn-download { background: #334155; color: #fff; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600; border: 1px solid #475569; transition: all 0.2s; }
+        .btn-download:hover { background: #475569; color: #60a5fa; border-color: #60a5fa; }
+
+        /* --- CORREÇÃO DO PLAYER (CSS NOVO) --- */
+        .video-container-styled .plyr { position: absolute !important; top: 0; left: 0; width: 100% !important; height: 100% !important; }
+        /* Esconde o botão play gigante central */
+        .plyr__control--overlaid { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+        .plyr--video .plyr__control.plyr__tab-focus, .plyr--video .plyr__control:hover, .plyr--video .plyr__control[aria-expanded=true] { background: #2563eb !important; }
+        .plyr--full-ui input[type=range] { color: #2563eb !important; }
+        .video-container-styled video { object-fit: contain; width: 100%; height: 100%; }
+/* --- ESTILO DAS NOTIFICAÇÕES VISUAIS (TOAST) --- */
+        @keyframes slideInToast {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOutToast {
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        .toast-card {
+            pointer-events: auto;
+            animation: slideInToast 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            background: rgba(30, 41, 59, 0.95); /* Slate-800 */
+            backdrop-filter: blur(8px);
+            border-left: 4px solid #3b82f6; /* Azul padrão */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+            width: 300px;
+            display: flex;
+            transition: all 0.3s;
+        }
+        .toast-success { border-left-color: #22c55e; } /* Verde */
+        .toast-chat { border-left-color: #eab308; } /* Amarelo */
+
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100">
+
+    <header class="bg-slate-950/90 sticky top-0 z-50 backdrop-blur-md border-b border-slate-800 shadow-lg">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0 cursor-pointer group" id="site-header-logo" onclick="location.reload()">
+                    <span class="text-3xl font-black text-white tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 group-hover:bg-gradient-to-l transition-all duration-500">A&M Produções</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-slate-300 hover:text-white text-sm font-semibold transition-colors">Home</a>
+                    <a href="#galeria" class="text-slate-300 hover:text-white text-sm font-semibold transition-colors">Galeria</a>
+                    <a href="#sobre" class="text-slate-300 hover:text-white text-sm font-semibold transition-colors">Sobre Nós</a>
+                    <a href="#contato" class="text-slate-300 hover:text-white text-sm font-semibold transition-colors">Contato</a>
+                    <button id="enable-notifications-btn" class="text-slate-400 hover:text-yellow-400 transition-colors relative group" title="Ativar Notificações">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <span id="notif-status-dot" class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-slate-900"></span>
+                        <span class="absolute top-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Ativar Avisos</span>
+                    </button>
+                    <button id="chat-navbar-button" class="hidden relative bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg hover:shadow-blue-500/30 flex items-center gap-2 transform hover:-translate-y-0.5">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                         Suporte <span id="chat-unread-badge" class="hidden notification-badge">1</span>
+                    </button>
+                </div>
+                <div class="flex md:hidden items-center">
+                    <button id="chat-mobile-button" class="hidden relative p-2 text-slate-400 hover:text-white mr-3">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        <span id="chat-unread-badge-mobile" class="hidden notification-badge">!</span>
+                    </button>
+                    <button id="mobile-menu-button" type="button" class="text-slate-300 hover:text-white focus:outline-none">
+                        <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <div class="hidden bg-slate-900 border-t border-slate-800" id="mobile-menu">
+            <div class="px-4 pt-4 pb-6 space-y-2">
+                <a href="#" class="text-slate-300 hover:bg-slate-800 hover:text-white block px-3 py-2.5 rounded-lg text-base font-medium transition-colors">Home</a>
+                <a href="#galeria" class="text-slate-300 hover:bg-slate-800 hover:text-white block px-3 py-2.5 rounded-lg text-base font-medium transition-colors">Galeria</a>
+                <a href="#sobre" class="text-slate-300 hover:bg-slate-800 hover:text-white block px-3 py-2.5 rounded-lg text-base font-medium transition-colors">Sobre Nós</a>
+                <a href="#contato" class="text-slate-300 hover:bg-slate-800 hover:text-white block px-3 py-2.5 rounded-lg text-base font-medium transition-colors">Contatos</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="carousel-section" class="carousel-container relative group">
+            <div id="loading-carousel" class="absolute inset-0 flex items-center justify-center bg-slate-950 z-10">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+            <div id="carousel-slides-wrapper" class="w-full h-full"></div>
+            <div class="absolute inset-0 flex items-center justify-between p-4 pointer-events-none">
+                <button class="pointer-events-auto hidden group-hover:flex items-center justify-center w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-sm transition-all transform hover:scale-110" onclick="prevSlide()"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                <button class="pointer-events-auto hidden group-hover:flex items-center justify-center w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-sm transition-all transform hover:scale-110" onclick="nextSlide()"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+            </div>
+            <div id="carousel-dots-container" class="carousel-dots"></div>
+        </section>
+
+        <section id="login-evento" class="bg-slate-900 py-16 border-y border-slate-800 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"></div>
+            <div class="container mx-auto px-4 text-center relative z-10">
+                <div class="max-w-lg mx-auto">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">Área do Cliente</h2>
+                    <p class="text-slate-400 mb-8 text-lg">Acesse seu projeto exclusivo.</p>
+                    <form id="login-evento-form" class="flex flex-col gap-4 bg-slate-800 p-6 rounded-2xl shadow-2xl border border-slate-700">
+                        <div class="relative"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div><input type="text" id="evento-id" placeholder="ID de Acesso" class="w-full bg-slate-900 text-white placeholder-slate-500 pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 border border-slate-600" autocomplete="off"></div>
+                        <div class="relative"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div><input type="password" id="evento-senha" placeholder="Senha" class="w-full bg-slate-900 text-white placeholder-slate-500 pl-10 pr-10 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 border border-slate-600"><button type="button" id="toggle-client-password" class="toggle-password-button absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-white"><svg class="w-5 h-5 eye-open" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg><svg class="w-5 h-5 eye-closed" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7 .946-3.11 3.588-5.524 6.69-6.317M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c.834 0 1.644.097 2.421.282m7.12 2.06A10.03 10.03 0 0112 19c-2.09 0-4.03-.64-5.65-1.79m12.65-9.578L4.929 4.929"></path></svg></button></div>
+                        <div class="flex items-center justify-between"><div class="flex items-center"><input id="remember-me" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"><label for="remember-me" class="ml-2 block text-sm text-slate-400 select-none">Lembrar de mim</label></div></div>
+                        <button type="submit" id="login-submit-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-lg py-3.5 rounded-xl transition duration-300 shadow-lg shadow-blue-900/20 flex items-center justify-center"><span>Acessar Projetos</span><div class="loading-spinner hidden ml-3 w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div></button>
+                    </form>
+                    <p id="login-message" class="text-center text-red-400 mt-4 h-6 text-sm font-semibold transition-all opacity-0"></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="galeria" class="py-20 relative overflow-hidden bg-slate-950">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 mb-10"><div class="flex items-center gap-4"><div class="h-10 w-1 bg-blue-500 rounded-full"></div><h2 class="text-3xl font-extrabold text-white tracking-tight">A&M Produções</h2></div></div>
+            <div id="gallery-container" class="relative w-full overflow-hidden"><div id="loading-gallery" class="w-full flex items-center justify-center text-slate-500 py-12"><div class="flex flex-col items-center gap-3"><div class="w-8 h-8 border-2 border-slate-600 border-t-blue-500 rounded-full animate-spin mb-3"></div><span class="text-sm font-medium">Carregando galeria...</span></div></div></div>
+        </section>
+        
+        <section id="client-portal-section" class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 hidden min-h-screen">
+            <div class="flex flex-col md:flex-row justify-between md:items-center mb-12 gap-6 border-b border-slate-800 pb-8">
+                <div class="flex items-center gap-5">
+                    <div id="client-portal-logo" class="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-2xl font-bold overflow-hidden bg-cover bg-center shadow-xl"><span class="text-slate-500">cli</span></div>
+                    <div><p class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1">Bem-vindo ao seu espaço</p><h2 id="client-portal-title" class="text-3xl font-bold text-white tracking-tight">Cliente</h2></div>
+                </div>
+                <button id="client-portal-back-button" class="group bg-slate-800 hover:bg-red-500/10 border border-slate-700 hover:border-red-500/50 text-slate-300 hover:text-red-400 font-medium px-6 py-3 rounded-xl transition-all duration-300 flex items-center gap-3 self-start md:self-center"><svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>Sair da Conta</button>
+            </div>
+            
+            <div id="welcome-message-box" class="hidden p-8 mb-12 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-2xl shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                <h3 id="welcome-title" class="text-2xl font-bold text-white mb-3 relative z-10"></h3>
+                <p id="welcome-text" class="text-slate-300 leading-relaxed max-w-2xl relative z-10"></p>
+            </div>
+
+            <div id="client-folders-view">
+                <div class="flex items-center gap-3 mb-8"><svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg><h3 class="text-xl font-bold text-white">Meus Projetos</h3></div>
+                <div id="client-folders-grid" class="flex flex-col gap-3">
+                    <div class="col-span-full py-12 text-center text-slate-500"><div class="inline-block w-8 h-8 border-2 border-slate-600 border-t-blue-500 rounded-full animate-spin mb-3"></div><p>Carregando pastas...</p></div>
+                </div>
+            </div>
+
+            <div id="client-project-details-view" class="hidden">
+                <div class="flex flex-col md:flex-row md:items-center gap-6 mb-10 pb-6 border-b border-slate-800">
+                    <button id="back-to-folders-btn" class="self-start p-3 bg-slate-800 rounded-full hover:bg-slate-700 transition text-white border border-slate-700 shadow-sm hover:shadow-md" title="Voltar"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg></button>
+                    <div class="flex-grow">
+                         <div class="flex items-center gap-3"><h3 id="detail-project-name" class="text-2xl md:text-3xl font-bold text-white tracking-tight">Nome do Projeto</h3><div id="detail-project-status" class="hidden md:block"></div></div>
+                         <div class="flex items-center gap-4 mt-1"><span id="detail-project-date" class="text-sm text-slate-400 font-medium block">Data</span><div id="detail-download-container"></div></div>
+                    </div>
+                    <div class="md:hidden" id="detail-project-status-mobile"></div>
+                </div>
+                
+                <div id="project-subfolders-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+
+                <div id="project-group-videos" class="hidden">
+                     <div class="flex items-center gap-3 mb-6 text-slate-300 text-sm font-mono bg-slate-800/50 p-2 rounded-lg inline-block border border-slate-700">
+                         <span id="current-project-breadcrumb">Projeto</span> <span class="text-slate-500">/</span> <span id="current-group-breadcrumb" class="text-white font-bold">Pasta</span>
+                     </div>
+                     <div id="detail-videos-container" class="space-y-10"></div>
+                </div>
+
+                <div id="detail-project-actions" class="mt-12 pt-8 border-t border-slate-800 flex justify-center md:justify-end"></div>
+            </div>
+        </section>
+
+        <section id="sobre" class="bg-slate-900 py-24 border-t border-slate-800">
+            <div class="container mx-auto px-4 text-center max-w-3xl"><span class="text-blue-500 font-bold tracking-wider text-xs uppercase mb-3 block">Quem Somos</span><h2 class="text-3xl md:text-4xl font-extrabold text-white mb-8">Sobre Nós</h2><p id="dynamic-about-text" class="text-lg text-slate-400 leading-relaxed">Carregando informações...</p></div>
+        </section>
+        <section id="contato" class="py-24 bg-slate-950">
+            <div class="container mx-auto px-4 text-center"><span class="text-blue-500 font-bold tracking-wider text-xs uppercase mb-3 block">Fale Conosco</span><h2 class="text-3xl md:text-4xl font-extrabold text-white mb-10">Entre em Contato</h2><p id="dynamic-contact-text" class="text-lg text-slate-400 mb-10 max-w-2xl mx-auto">Pronto para o seu próximo evento?</p><a id="dynamic-whatsapp-btn" href="#" target="_blank" class="inline-flex items-center justify-center text-white font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 bg-green-600 hover:bg-green-500 shadow-xl hover:shadow-green-500/20 animate-pulse-border transform hover:-translate-y-1"><svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>WhatsApp</a>
+            </div>
+        </section>
+
+    </main>
+    
+    <div id="chat-modal" class="hidden chat-modal">
+        <button id="chat-close-modal-main" class="absolute top-4 right-4 z-20 text-white/70 hover:text-white transition-colors"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        <div class="bg-blue-600 pl-4 pr-12 py-4 rounded-t-2xl flex justify-between items-center flex-shrink-0">
+            <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-blue-600 font-bold"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg></div><div><h5 class="text-white font-bold leading-tight">Suporte A&M</h5><div class="flex items-center text-xs text-blue-100"><span id="admin-online-status">Online agora</span><span id="admin-typing-indicator" class="hidden">Digitando...</span></div></div></div>
+            <button id="chat-new-btn" class="hidden text-white/70 hover:text-white transition-colors bg-blue-500/50 p-1.5 rounded-full" title="Nova Conversa"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
+        </div>
+        
+        <div id="chat-pre-screen" class="p-6 flex flex-col justify-between flex-grow">
+            <h5 class="text-xl font-bold text-white mb-4">Novo Atendimento</h5>
+            <form id="chat-pre-form" class="space-y-4 flex-grow flex flex-col">
+                <input type="text" id="chat-name" placeholder="Seu Nome" class="w-full bg-slate-900 text-white px-4 py-3 rounded-xl border border-slate-700 focus:ring-blue-500 focus:border-blue-500 transition-colors" required>
+                <input type="tel" id="chat-phone" placeholder="WhatsApp (Opcional)" class="w-full bg-slate-900 text-white px-4 py-3 rounded-xl border border-slate-700 focus:ring-blue-500 focus:border-blue-500 transition-colors" required>
+                <textarea id="chat-subject" placeholder="Assunto ou primeira mensagem" rows="3" class="w-full bg-slate-900 text-white px-4 py-3 rounded-xl border border-slate-700 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none" required></textarea>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition mt-4">Iniciar Conversa</button>
+            </form>
+        </div>
+
+        <div id="chat-live-screen" class="hidden flex-col flex-grow">
+            <div id="chat-messages-container" class="flex-grow overflow-y-auto p-4 flex flex-col-reverse space-y-2 space-y-reverse relative">
+                 <div id="chat-empty-state-btn" class="hidden absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <button id="btn-start-fresh-chat" class="pointer-events-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-all transform hover:scale-105 flex items-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>Iniciar Nova Conversa</button>
+                </div>
+                <div id="chat-messages-div" class="flex flex-col"></div>
+            </div>
+            <form id="chat-send-form" class="p-4 bg-slate-800 flex-shrink-0 border-t border-slate-700 flex gap-2">
+                <input type="text" id="chat-message-input" placeholder="Digite sua mensagem..." class="flex-grow bg-slate-900 text-white px-4 py-3 rounded-xl border border-slate-700 focus:ring-blue-500 focus:border-blue-500 transition-colors" required>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-full transition-colors shadow-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg></button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="video-ajuste-modal" class="hidden fixed inset-0 z-[150] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 md:p-6">
+        <div class="w-full max-w-7xl h-[90vh] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-gray-800 flex flex-col md:flex-row relative">
+            
+            <div id="ajuste-video-section" class="hidden md:flex w-full md:w-2/3 h-2/5 md:h-full bg-black items-center justify-center relative group mobile-hidden">
+                <div id="ajuste-player-container" class="w-full h-full flex items-center justify-center bg-black"></div>
+                <div class="hidden md:block absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none">
+                    <h3 id="ajuste-video-title" class="text-lg md:text-xl font-bold text-white truncate drop-shadow-md">Nome do Vídeo</h3>
+                    <p id="ajuste-video-group" class="text-sm text-slate-400">Pasta: Geral</p>
+                </div>
+            </div>
+
+            <div id="ajuste-sidebar-section" class="w-full md:w-1/3 h-full md:h-full flex flex-col bg-gray-800 border-l border-gray-700 relative mobile-full">
+                
+                <div class="p-3 border-b border-gray-700 bg-gray-800 shadow-sm z-10 flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                         <h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                             <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                             Ajustes
+                         </h4>
+                         <button id="sidebar-back-btn" class="bg-slate-700 hover:bg-slate-600 text-white rounded-lg px-3 py-1.5 text-xs font-bold flex items-center justify-center transition shadow-sm border border-slate-600 focus:outline-none gap-2">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                              Fechar
+                         </button>
+                    </div>
+                    
+                    <div class="md:hidden flex justify-between items-center bg-gray-900/50 p-2 rounded border border-gray-700">
+                        <span id="mobile-video-title-display" class="text-xs font-bold text-white truncate max-w-[150px]">Vídeo</span>
+                        <span id="mobile-video-status-display" class="text-[10px] px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">Pendente</span>
+                    </div>
+
+                    <button id="mobile-toggle-video-btn" class="md:hidden w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors shadow-md">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        Ocultar Vídeo
+                    </button>
+                </div>
+
+                <div class="flex-grow overflow-y-auto p-4 space-y-3 bg-gray-900/50 custom-scrollbar" id="scroll-container-comments">
+                     <div id="instruction-box" class="bg-[#1e293b] border border-slate-600 rounded-lg p-4 mb-4 relative shadow-sm shrink-0"><button id="close-instruction-box" class="absolute top-2 right-2 text-slate-400 hover:text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button><div class="flex items-start gap-3"><div class="mt-0.5"><svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><div id="instruction-text-content" class="text-xs text-slate-300"></div></div></div>
+                    <ul id="ajuste-comment-list" class="space-y-3"></ul><div id="ajuste-no-comments" class="flex flex-col items-center justify-center h-40 text-gray-500 text-sm text-center"><p>Nenhum ajuste solicitado.</p></div>
+                </div>
+                <div class="p-4 bg-gray-800 border-t border-gray-700 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.2)] z-20 mt-auto relative">
+                    <div id="edit-mode-indicator" class="hidden absolute -top-8 left-0 w-full bg-blue-600 text-white text-xs py-1 px-4 flex justify-between items-center"><span>Editando...</span><button id="cancel-edit-mode-btn" class="hover:text-gray-200 font-bold">Cancelar</button></div>
+                    <form id="ajuste-comment-form" class="flex flex-col gap-3">
+                        <div class="flex gap-2">
+                            <div class="relative w-28 flex-shrink-0">
+                                <input type="text" id="ajuste-timestamp-input" placeholder="Geral" class="w-full bg-gray-700 text-white pl-2 pr-2 py-3 rounded-lg border border-gray-600 text-sm text-center" readonly>
+                            </div>
+                            <button type="submit" id="add-adjustment-btn" class="flex-grow bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-3 rounded-lg">Adicionar</button>
+                        </div>
+                        
+                        <div id="print-preview-container" class="hidden relative group rounded-lg overflow-hidden border border-gray-600">
+                            <img id="ajuste-print-preview" src="" class="w-full h-auto object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Print do momento">
+                            <div class="absolute top-1 right-1 bg-black/70 text-white text-[10px] px-2 py-1 rounded">Print Automático</div>
+                        </div>
+
+                        <textarea id="ajuste-comment-text" rows="2" class="w-full bg-gray-700 text-white px-3 py-3 rounded-lg border border-gray-600 text-sm resize-none" placeholder="Descreva o ajuste..." required></textarea>
+                        <button type="button" id="submit-final-adjustments" class="w-full mt-1 bg-green-600 hover:bg-green-500 text-white text-sm font-bold py-3 rounded-lg">Concluir e Enviar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="system-modal" class="hidden fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-gray-800 w-11/12 md:w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center border border-gray-700"><h3 id="system-modal-title" class="text-xl font-bold text-white mb-3"></h3><p id="system-modal-message" class="text-gray-300 mb-6"></p><div id="system-modal-confirm-actions" class="flex flex-col md:flex-row justify-center gap-3 hidden"><button id="system-modal-cancel-btn" class="w-full md:w-auto bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-6 rounded-xl">Cancelar</button><button id="system-modal-ok-btn" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl">Confirmar</button></div><div id="system-modal-alert-actions" class="hidden flex justify-center"><button id="system-modal-close-btn" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-10 rounded-xl">OK</button></div></div></div>
+    <div id="feedback-modal" class="hidden fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-gray-800 w-full max-w-md rounded-3xl shadow-2xl border border-gray-700 overflow-hidden"><div class="bg-gradient-to-r from-green-600 to-emerald-600 p-6 text-center"><h3 class="text-2xl font-bold text-white mb-1">Aprovar Projeto</h3><p class="text-green-100 text-sm">Que bom que gostou!</p></div><div class="p-8"><div class="flex justify-center mb-8"><div id="feedback-emoji-display" class="text-7xl animate-emoji">🤩</div></div><div class="mb-8"><div class="flex justify-between mb-2 text-xs font-bold uppercase text-slate-400"><span>Nota</span><span id="feedback-rating-value" class="text-white text-lg">10</span></div><input type="range" id="feedback-rating-slider" min="0" max="10" value="10" step="1" class="w-full h-2 bg-slate-700 rounded-lg accent-blue-500"><div class="flex justify-between mt-2 text-[10px] text-slate-500"><span>0</span><span>5</span><span>10</span></div></div><div class="mb-6"><textarea id="feedback-comment" rows="3" class="w-full bg-slate-900/50 text-white px-4 py-3 rounded-xl border border-slate-700 outline-none resize-none" placeholder="Deixe um feedback (Opcional)"></textarea></div><div class="flex gap-3"><button id="feedback-cancel-btn" class="flex-1 py-3.5 rounded-xl bg-slate-700 text-white font-bold">Cancelar</button><button id="feedback-confirm-btn" class="flex-1 py-3.5 rounded-xl bg-green-600 text-white font-bold">Confirmar</button></div></div></div></div>
+    <div id="gallery-expand-modal" class="hidden fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm"><div class="relative w-full max-w-5xl max-h-[90vh] bg-black rounded-lg overflow-hidden shadow-2xl"><button id="close-gallery-expand-btn" class="absolute top-4 right-4 z-10 text-white/80 hover:text-white bg-black/50 p-2 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button><div id="gallery-expanded-media" class="w-full h-full aspect-video flex items-center justify-center"></div></div></div>
+
+    <script type="module">
+        // ATENÇÃO: Mudança para versão 10.13.1 (ESTÁVEL)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, onSnapshot, query, orderBy, updateDoc, serverTimestamp, addDoc, setDoc, where, deleteField, writeBatch, getDocs } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+        
+        const Vimeo = window.Vimeo; 
+        // IMPORTANTE: Certifique-se de que estas chaves são as chaves REAIS do seu projeto Firebase.
+        const firebaseConfig = { apiKey: "AIzaSyCEPSJnCMVZb7q2JOogzF-bNmQEejtEhxQ", authDomain: "render-8da87.firebaseapp.com", projectId: "render-8da87", storageBucket: "render-8da87.firebasestorage.app", messagingSenderId: "155910599332", appId: "1:155910599332:web:dc4e7b5c93841dec3fec31" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // ============================================================================
+        // 1. GLOBAL VARIABLES
+        // ============================================================================
+        let currentLoggedInClientId = null;
+        let currentLoggedInClientName = null;
+        let slideInterval;
+        let currentSlideIndex = 0;
+        let currentOpenedProjectId = null;
+        let currentNavLevel = 'projects_root';
+        let editingAdjustmentIndex = -1;
+        window.currentVideoUnsubscribe = null;
+        let siteConfig = {};
+        const LS_ID_KEY = 'am_client_id';
+        const LS_PASS_KEY = 'am_client_pass';
+
+        // ============================================================================
+        //  SISTEMA DE NOTIFICAÇÕES (PUSH & SOM)
+        // ============================================================================
+        
+        // Som de notificação (Base64 curto para não precisar de arquivo externo)
+        const notificationSound = new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjIwLjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABYaW5nAAAADwAAAA8AAC1LAQECAgMDAwQEBAUFBQYGBgYHBwcICAgJCQoKCgsLCwwMDA0NDQ4ODg8PDxAQEBERERISEhMTExQUFBUVFRYWFhcXFxgYGBkZGRoaGhsbGxwcHB0dHR4eHh8fHyAgICEhISIiIiMjIyQEBAUFBQYGBgcHBwgICAkJCgoKCwsLDAwMDQ0NDg4ODw8PEBAQEREREhISExMTFBQUFRUVFhYWFxcXGBgYGRkZGhoaGxsbHBwcHR0dHh4eHx8fICAgISEhIiIiIyMj//uQZAAP8AAANAAAAAAA0AAAAAAA0AEAAABAAAAAAAAAAABAAAAAAAAAAAAAD/4zAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//uQZAAP8AAANAAAAAAA0AAAAAAA0AEAAABAAAAAAAAAAABAAAAAAAAAAAAAD/4zAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//uQZAAP8AAANAAAAAAA0AAAAAAA0AEAAABAAAAAAAAAAABAAAAAAAAAAAAAD/4zAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        notificationSound.volume = 0.5;
+
+        // Hora que o cliente entrou no site (para não notificar coisas velhas)
+        const sessionStartTime = new Date();
+
+        function requestNotificationPermission() {
+            if (!("Notification" in window)) {
+                alert("Este navegador não suporta notificações.");
+                return;
+            }
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    const dot = document.getElementById('notif-status-dot');
+                    if(dot) { dot.classList.remove('bg-red-500'); dot.classList.add('bg-green-500'); }
+                    new Notification("Notificações Ativadas!", { body: "Você será avisado sobre ajustes e mensagens.", icon: "https://cdn-icons-png.flaticon.com/512/1827/1827349.png" });
+                    notificationSound.play().catch(e => console.log("Som bloqueado até interação"));
+                }
+            });
+        }
+
+        function sendBrowserNotification(title, body) {
+            if (Notification.permission === "granted") {
+                notificationSound.play().catch(() => {});
+                const notif = new Notification(title, {
+                    body: body,
+                    icon: "https://ik.imagekit.io/4njfx3ixs/Logo%20a&m.png", // Seu Logo
+                    requireInteraction: false
+                });
+                notif.onclick = () => { window.focus(); };
+            }
+        }
+
+        // Listener do Botão
+        document.getElementById('enable-notifications-btn').addEventListener('click', requestNotificationPermission);
+
+        // ============================================================================
+        // 2. FUNCTION DEFINITIONS (HOISTED TO TOP SCOPE)
+        // ============================================================================
+
+        function initializeLoginFields() {
+            const storedId = localStorage.getItem(LS_ID_KEY);
+            const storedPass = localStorage.getItem(LS_PASS_KEY);
+            if (storedId && storedPass) {
+                const idInput = document.getElementById('evento-id');
+                const passInput = document.getElementById('evento-senha');
+                const rememberCheck = document.getElementById('remember-me');
+                
+                if (idInput && passInput && rememberCheck) {
+                    idInput.value = storedId;
+                    passInput.value = storedPass;
+                    rememberCheck.checked = true;
+                    // Auto Login Trigger with slight delay
+                    setTimeout(() => {
+                        const btn = document.getElementById('login-submit-btn');
+                        if(btn) btn.click();
+                    }, 500);
+                }
+            }
+        }
+
+        // --- Modal Helper Functions ---
+        function replaceElement(id) { 
+            const el = document.getElementById(id); 
+            if(!el) return null; 
+            const newEl = el.cloneNode(true); 
+            el.parentNode.replaceChild(newEl, el); 
+            return newEl; 
+        }
+        
+        function showModal(title, message, isConfirm = false, onConfirm = null) {
+            const modalTitle = document.getElementById('system-modal-title');
+            const modalMessage = document.getElementById('system-modal-message');
+            const systemModal = document.getElementById('system-modal');
+            const confirmActions = document.getElementById('system-modal-confirm-actions');
+            const alertActions = document.getElementById('system-modal-alert-actions');
+
+            if (modalTitle) modalTitle.textContent = title;
+            if (modalMessage) modalMessage.textContent = message;
+            
+            const confirmBtn = replaceElement('system-modal-ok-btn');
+            const cancelBtn = replaceElement('system-modal-cancel-btn');
+            const closeBtn = replaceElement('system-modal-close-btn');
+            
+            if (isConfirm) {
+                confirmActions.classList.remove('hidden'); 
+                alertActions.classList.add('hidden');
+                if (confirmBtn) confirmBtn.addEventListener('click', () => { systemModal.classList.add('hidden'); if(onConfirm) onConfirm(); });
+                if (cancelBtn) cancelBtn.addEventListener('click', () => systemModal.classList.add('hidden'));
+            } else {
+                confirmActions.classList.add('hidden'); 
+                alertActions.classList.remove('hidden');
+                if (closeBtn) closeBtn.addEventListener('click', () => { systemModal.classList.add('hidden'); if(onConfirm) onConfirm(); });
+            }
+            systemModal.classList.remove('hidden');
+        }
+
+        // --- Video & Config Helpers ---
+        function stopBackgroundVideos() {
+            document.querySelectorAll('video').forEach(v => v.pause());
+            document.querySelectorAll('iframe').forEach(i => i.contentWindow.postMessage(JSON.stringify({event:'command',func:'pauseVideo'}), '*'));
+        }
+        
+        function getMediaHtml(url, type, autoPlay=false) {
+            if(!url) return '';
+            const fit = autoPlay ? 'object-cover' : 'object-contain';
+            
+            if(type==='image' || url.match(/\.(jpg|jpeg|png|webp|gif|svg)$/)) return `<img src="${url}" class="w-full h-full ${fit}" loading="lazy">`;
+            
+            if(url.includes('drive.google.com')) {
+                const id = url.match(/\/d\/([^/]+)/)?.[1] || url.match(/id=([^&]+)/)?.[1];
+                return id ? `<iframe src="https://drive.google.com/file/d/${id}/preview" allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe>` : '';
+            }
+            if(url.includes('youtube') || url.includes('youtu.be')) {
+                const id = url.match(/(?:v=|youtu\.be\/|\/embed\/)([^&?]+)/)?.[1];
+                return id ? `<iframe src="https://www.youtube.com/embed/${id}?enablejsapi=1&${autoPlay?'autoplay=1&mute=1&loop=1&playlist='+id:''}" allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe>` : '';
+            }
+            if(url.includes('vimeo')) {
+                 const id = url.match(/vimeo\.com\/([0-9]+)/)?.[1];
+                 return id ? `<iframe src="https://player.vimeo.com/video/${id}?${autoPlay?'autoplay=1&muted=1&loop=1':''}" allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe>` : '';
+            }
+            return `<video src="${url}" class="w-full h-full ${fit}" ${autoPlay?'autoplay muted loop playsinline':'controls'} loading="lazy"></video>`;
+        }
+
+        function loadSiteConfig() {
+            onSnapshot(doc(db, 'siteConfig', 'main'), (snap) => {
+                if(snap.exists()) {
+                    siteConfig = snap.data();
+                    if(siteConfig.logoUrl) {
+                        const logoEl = document.getElementById('site-header-logo');
+                        if (logoEl) logoEl.innerHTML = `<img src="${siteConfig.logoUrl}" class="h-16 w-auto object-contain" loading="lazy">`;
+                    }
+                    const aboutText = document.getElementById('dynamic-about-text');
+                    if (aboutText) aboutText.textContent = siteConfig.aboutText || '';
+                    
+                    const contactText = document.getElementById('dynamic-contact-text');
+                    if (contactText) contactText.textContent = siteConfig.contactText || '';
+                    
+                    if(siteConfig.whatsapp) {
+                        const waBtn = document.getElementById('dynamic-whatsapp-btn');
+                        if (waBtn) waBtn.href = `https://api.whatsapp.com/send?phone=${siteConfig.whatsapp.replace(/\D/g,'')}`;
+                    }
+                }
+            }, (error) => { console.error("Erro ao carregar configurações do site:", error); });
+        }
+
+        // --- Adjustments Logic ---
+        let currentAdjustData = null;
+        
+        function formatAndSetTime(timeInSeconds) {
+            if(!isNaN(timeInSeconds)) {
+                const minutes = Math.floor(timeInSeconds / 60);
+                const seconds = Math.floor(timeInSeconds % 60);
+                const input = document.getElementById('ajuste-timestamp-input');
+                if (input) input.value = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        function addNativePauseListener() {
+             const videoEl = document.getElementById('ajuste-player-container')?.querySelector('video');
+             const iframe = document.getElementById('ajuste-player-container')?.querySelector('iframe');
+             if(videoEl && videoEl.hasAttribute('src')) videoEl.addEventListener('pause', (e)=>formatAndSetTime(e.target.currentTime));
+             else if (iframe && iframe.src.includes('youtube') && window.YT) window.onYouTubeIframeAPIReady();
+             
+             const tsInput = document.getElementById('ajuste-timestamp-input');
+             if (tsInput) tsInput.removeEventListener('focus', addNativePauseListener);
+        }
+
+        function renderAdjustComments(pid, vid) {
+            const list = document.getElementById('ajuste-comment-list');
+            const noComments = document.getElementById('ajuste-no-comments');
+            editingAdjustmentIndex = -1;
+            
+            onSnapshot(doc(db, 'clients', currentLoggedInClientId, 'projects', pid, 'videos', vid), (docSnap) => {
+                if(!docSnap.exists()) return;
+                const data = docSnap.data();
+                const adjs = data.adjustments || [];
+                const videoStatus = data.videoStatus;
+                
+                const canModify = videoStatus !== 'approved';
+                const submitFinalBtn = document.getElementById('submit-final-adjustments');
+                
+                if (submitFinalBtn) submitFinalBtn.classList.toggle('hidden', !(adjs.length > 0 && canModify));
+                
+                if (list) list.innerHTML = '';
+                
+                if(adjs.length === 0) {
+                    if (noComments) noComments.classList.remove('hidden');
+                } else {
+                    if (noComments) noComments.classList.add('hidden');
+                    adjs.forEach((adj, index) => {
+                        const li = document.createElement('li');
+                        li.className = "bg-gray-700/50 p-3 rounded-lg border border-gray-600 group relative";
+                        
+                        let buttonsHtml = canModify ? `<div class="flex gap-2"><button class="text-blue-400 hover:text-blue-300 edit-adj-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536L16.732 3.732z"></path></svg></button><button class="text-red-400 hover:text-red-300 del-adj-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></div>` : `<span class="text-sm text-green-500 font-bold">Aprovado</span>`;
+                        
+                        // HTML DO PRINT NO CARD
+                        const printHtml = adj.print ? `<div class="mb-2 mt-1 rounded overflow-hidden border border-gray-600"><img src="${adj.print}" class="w-full h-auto object-cover max-h-32"></div>` : '';
+
+                        li.innerHTML = `
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-2"><span class="flex items-center justify-center px-2 py-1 rounded bg-blue-900/50 text-blue-400 text-xs font-mono font-bold border border-blue-500/30">${adj.timestamp || 'Geral'}</span></div>
+                                ${buttonsHtml}
+                            </div>
+                            ${printHtml}
+                            <p class="text-sm text-gray-200 leading-relaxed">${adj.comment}</p>
+                        `;
+                        
+                        if (canModify) {
+                            li.querySelector('.del-adj-btn').addEventListener('click', () => {
+                                showModal("Excluir", "Apagar comentário?", true, async () => {
+                                    const newAdjs = adjs.filter((_, i) => i !== index);
+                                    await updateDoc(doc(db, 'clients', currentLoggedInClientId, 'projects', pid, 'videos', vid), { adjustments: newAdjs });
+                                    if(editingAdjustmentIndex===index) document.getElementById('cancel-edit-mode-btn').click();
+                                });
+                            });
+                            li.querySelector('.edit-adj-btn').addEventListener('click', () => {
+                                editingAdjustmentIndex = index;
+                                document.getElementById('ajuste-timestamp-input').value = adj.timestamp || 'Geral';
+                                document.getElementById('ajuste-comment-text').value = adj.comment;
+                                // Se tiver print, mostra no preview também ao editar
+                                if(adj.print) {
+                                    document.getElementById('ajuste-print-preview').src = adj.print;
+                                    document.getElementById('print-preview-container').classList.remove('hidden');
+                                }
+                                const btn = document.getElementById('add-adjustment-btn');
+                                btn.innerText = 'Salvar'; btn.className = "flex-grow bg-green-600 hover:bg-green-500 text-white text-sm font-bold py-3 rounded-lg transition-colors shadow-md";
+                                document.getElementById('edit-mode-indicator').classList.remove('hidden');
+                            });
+                        }
+                        if (list) list.appendChild(li);
+                    });
+                }
+            });
+        }
+
+        // --- FUNÇÃO PARA CAPTURAR PRINT DO VÍDEO (NOVO) ---
+        function captureVideoFrame(videoElement) {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = videoElement.videoWidth;
+                canvas.height = videoElement.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                return canvas.toDataURL('image/jpeg', 0.7); // Qualidade 0.7
+            } catch (e) {
+                console.error("Erro ao capturar print (CORS?):", e);
+                return null;
+            }
+        }
+
+        // --- LÓGICA DO MODAL DE AJUSTE (COM INSTRUÇÕES DINÂMICAS) ---
+        function openAdjustModal(pid, vid, url, name, groupName = 'Geral') { 
+            stopBackgroundVideos();
+            currentAdjustData = { pid, vid, url, name };
+            const modal = document.getElementById('video-ajuste-modal');
+            const playerContainer = document.getElementById('ajuste-player-container');
+            const instructionContent = document.getElementById('instruction-text-content');
+            
+            // Reseta UI
+            const timeInput = document.getElementById('ajuste-timestamp-input');
+            const commentInput = document.getElementById('ajuste-comment-text');
+            
+            timeInput.value = '';
+            commentInput.value = '';
+            
+            // Limpa preview do print
+            const printContainer = document.getElementById('print-preview-container');
+            const printImg = document.getElementById('ajuste-print-preview');
+            if(printContainer) printContainer.classList.add('hidden');
+            if(printImg) printImg.src = '';
+
+            if (!modal || !playerContainer) return;
+            
+            modal.classList.remove('hidden');
+            document.getElementById('ajuste-video-title').textContent = name;
+            document.getElementById('ajuste-video-group').textContent = `Pasta: ${groupName}`; 
+            
+            // Info Mobile
+            const mobileTitle = document.getElementById('mobile-video-title-display');
+            if(mobileTitle) mobileTitle.textContent = name;
+            
+            // Reset Layout Mobile
+            const videoSec = document.getElementById('ajuste-video-section');
+            const toggleBtn = document.getElementById('mobile-toggle-video-btn');
+            if(videoSec) videoSec.classList.remove('hidden-mobile-video');
+            if(toggleBtn) toggleBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> Ocultar Vídeo';
+
+            playerContainer.innerHTML = getMediaHtml(url, null, false);
+            
+            // Verifica se é Drive
+            const urlLower = url.toLowerCase();
+            const isDrive = urlLower.includes('drive.google.com');
+
+            // --- LÓGICA DE INSTRUÇÕES (O que você pediu) ---
+            if (instructionContent) {
+                if (isDrive) {
+                    // MODO MANUAL (DRIVE)
+                    instructionContent.innerHTML = `
+                        <p class="font-bold mb-1 text-yellow-400 text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            Vídeo do Google Drive:
+                        </p>
+                        <ul class="space-y-1 list-disc list-inside text-slate-300 text-xs mt-1">
+                            <li>Pause o vídeo onde deseja o ajuste.</li>
+                            <li><b class="text-white">Digite o tempo manualmente</b> no campo acima (Ex: 01:23).</li>
+                            <li>Escreva o detalhe do ajuste.</li>
+                        </ul>`;
+                    
+                    // Libera o campo para digitação
+                    if(timeInput) {
+                        timeInput.placeholder = 'Digite (ex: 01:23)';
+                        timeInput.readOnly = false; 
+                        timeInput.classList.remove('bg-gray-700');
+                        timeInput.classList.add('bg-slate-800', 'border-yellow-500/50');
+                    }
+                } else {
+                    // MODO AUTOMÁTICO (Nativo/Upload)
+                    instructionContent.innerHTML = `
+                        <p class="font-bold mb-1 text-white text-sm">Instruções:</p>
+                        <ul class="space-y-1 list-disc list-inside text-slate-300 text-xs">
+                            <li>Ao pausar, o <b>tempo</b> e o <b>print</b> são capturados automaticamente.</li>
+                            <li>Descreva o ajuste e clique em Adicionar.</li>
+                        </ul>`;
+                    
+                    // Bloqueia digitação para forçar o pause (garante precisão)
+                    if(timeInput) {
+                        timeInput.placeholder = 'Geral (ou pause)';
+                        timeInput.readOnly = true;
+                        timeInput.classList.add('bg-gray-700');
+                        timeInput.classList.remove('bg-slate-800', 'border-yellow-500/50');
+                    }
+                }
+            }
+
+            // --- CONFIGURAÇÃO DO PLAYER E CAPTURA ---
+            const videoEl = playerContainer.querySelector('video');
+            const iframe = playerContainer.querySelector('iframe');
+
+            // Função interna para capturar tempo E print
+            const handlePause = (currentTime) => {
+                formatAndSetTime(currentTime);
+                if (videoEl) {
+                    const printData = captureVideoFrame(videoEl);
+                    if (printData) {
+                        const img = document.getElementById('ajuste-print-preview');
+                        img.src = printData;
+                        document.getElementById('print-preview-container').classList.remove('hidden');
+                    }
+                }
+            };
+
+            if (videoEl && !isDrive) {
+                videoEl.setAttribute('crossorigin', 'anonymous');
+                const player = new Plyr(videoEl, {
+                    controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                    clickToPlay: true
+                });
+                player.on('pause', () => handlePause(player.currentTime));
+            } 
+            else if (iframe && iframe.src.includes('vimeo')) {
+                 const player = new Vimeo.Player(iframe);
+                 player.on('pause', (data) => formatAndSetTime(data.seconds));
+            } 
+            else if (iframe && iframe.src.includes('youtube')) {
+                 window.onYouTubeIframeAPIReady = () => { 
+                    new YT.Player(iframe, { 
+                        events: { 
+                            'onReady': (event) => event.target.playVideo(), 
+                            'onStateChange': (e) => { if (e.data == YT.PlayerState.PAUSED) formatAndSetTime(e.target.getCurrentTime()); }
+                        }
+                    }); 
+                 };
+            }
+
+            renderAdjustComments(pid, vid);
+        }
+
+        // --- Main Project/Video Functions ---
+        function updateProjectActions(projectId, status) {
+            const actionsDiv = document.getElementById('detail-project-actions');
+            const statusEl = document.getElementById('detail-project-status');
+            const statusMobileEl = document.getElementById('detail-project-status-mobile');
+            let statusHtml = '';
+
+            if(status === 'approved') {
+                statusHtml = '<span class="status-badge status-badge-approved text-sm py-1 px-3 bg-green-900 text-green-200 rounded-full font-bold border border-green-700">Projeto Aprovado</span>';
+                actionsDiv.innerHTML = `<div class="text-center w-full bg-green-900/20 p-6 rounded-2xl border border-green-500/30"><div class="flex flex-col items-center gap-3"><h4 class="text-xl font-bold text-white">Projeto Aprovado!</h4><p class="text-slate-400 text-sm mb-2">Obrigado pelo seu feedback.</p><button id="undo-project-approval-btn" class="text-sm text-red-400 hover:text-red-300 hover:underline transition-colors cursor-pointer font-medium flex items-center gap-2">Desfazer aprovação</button></div></div>`;
+                document.getElementById('undo-project-approval-btn')?.addEventListener('click', () => {
+                    showModal('Atenção', 'Cancelar aprovação?', true, async () => {
+                         const projectRef = doc(db, 'clients', currentLoggedInClientId, 'projects', projectId);
+                         await updateDoc(projectRef, { projectStatus: 'pending', clientRating: deleteField(), clientFeedback: deleteField(), lastUpdated: serverTimestamp() });
+                         const videosSnapshot = await getDocs(collection(db, 'clients', currentLoggedInClientId, 'projects', projectId, 'videos'));
+                         const batch = writeBatch(db);
+                         videosSnapshot.forEach(vDoc => { batch.update(vDoc.ref, { videoStatus: 'pending', clientRating: deleteField(), clientFeedback: deleteField(), lastUpdated: serverTimestamp() }); });
+                         await batch.commit();
+                        updateProjectActions(projectId, 'pending');
+                    });
+                });
+            } else {
+                statusHtml = '<span class="status-badge status-badge-pending text-sm py-1 px-3 bg-blue-900 text-blue-200 rounded-full font-bold border border-blue-700">Em Andamento</span>';
+                actionsDiv.innerHTML = `<button class="w-full md:w-auto px-10 py-5 bg-green-600 hover:bg-green-500 text-white text-base font-bold rounded-2xl transition-all shadow-xl shadow-green-900/30 flex items-center justify-center gap-3" id="approve-full-project-btn">Aprovar Projeto Completo</button>`;
+                document.getElementById('approve-full-project-btn')?.addEventListener('click', () => openFeedbackModal('project', projectId));
+            }
+            if(statusEl) statusEl.innerHTML = statusHtml;
+            if(statusMobileEl) statusMobileEl.innerHTML = statusHtml;
+        }
+
+        function openSubfolderVideos(cid, pid, groupName) {
+            currentNavLevel = 'subfolder_videos';
+            document.getElementById('project-subfolders-list').classList.add('hidden');
+            document.getElementById('project-group-videos').classList.remove('hidden');
+            document.getElementById('current-project-breadcrumb').textContent = document.getElementById('detail-project-name').textContent;
+            document.getElementById('current-group-breadcrumb').textContent = groupName;
+            
+            const cont = document.getElementById('detail-videos-container');
+            cont.innerHTML = '<p class="text-center text-slate-500">Carregando vídeos...</p>';
+            
+            if(window.currentVideoUnsubscribe) window.currentVideoUnsubscribe();
+            
+            const q = query(collection(db, 'clients', cid, 'projects', pid, 'videos'), orderBy('orderNumber'));
+            window.currentVideoUnsubscribe = onSnapshot(q, (snap) => {
+                cont.innerHTML = '';
+                const videos = [];
+                snap.forEach(d => {
+                    const vd = d.data();
+                    const g = vd.groupName || 'Geral';
+                    if(g === groupName || (groupName === 'Geral' && !['Geral', ...(vd.groupName?[vd.groupName]:[])].includes(vd.groupName))) {
+                         if (g === groupName) videos.push({id: d.id, data: vd});
+                    }
+                });
+                
+                if (videos.length === 0) { cont.innerHTML = '<p class="text-center text-slate-500 py-10">Esta pasta está vazia.</p>'; return; }
+                
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8';
+                
+                videos.forEach(item => {
+                     const v = item.data; const vid = item.id;
+                     const card = document.createElement('div');
+                     card.className = 'card-video-styled flex flex-col shadow-lg border border-slate-700/50'; 
+                     
+                     // --- LÓGICA DE STATUS ATUALIZADA ---
+                     let statusText = 'PENDENTE';
+                     let statusBg = 'bg-slate-800 text-slate-400 border-slate-600';
+                     
+                     if (v.videoStatus === 'approved') { 
+                         statusText = 'APROVADO'; 
+                         statusBg = 'bg-green-900/50 text-green-400 border-green-700'; 
+                     } 
+                     else if (v.videoStatus === 'adjusting') { 
+                         statusText = 'EM AJUSTE'; 
+                         statusBg = 'bg-yellow-900/50 text-yellow-400 border-yellow-700'; 
+                     }
+                     else if (v.videoStatus === 'adjusted') { 
+                         statusText = 'VÍDEO AJUSTADO'; 
+                         statusBg = 'bg-blue-900/50 text-blue-400 border-blue-700'; // Azul para indicar pronto
+                     }
+
+                     // Verifica tipo de vídeo
+                     const isYoutube = v.videoUrl.includes('youtube') || v.videoUrl.includes('youtu.be');
+                     const isVimeo = v.videoUrl.includes('vimeo');
+                     const isDrive = v.videoUrl.includes('drive.google.com');
+                     
+                     let mediaHtml = '';
+                     let isNativeVideo = false;
+                     const uniqueId = `video-${vid}`;
+
+                     if (isYoutube || isVimeo || isDrive) {
+                         mediaHtml = getMediaHtml(v.videoUrl, null, false);
+                     } else {
+                         isNativeVideo = true;
+                         mediaHtml = `
+                            <video id="${uniqueId}" class="player-target w-full h-full" controls playsinline preload="metadata" crossorigin>
+                                <source src="${v.videoUrl}" type="video/mp4" />
+                                <source src="${v.videoUrl}" type="video/webm" />
+                            </video>
+                         `;
+                     }
+
+                     // Preparar Download
+                     const downloadName = `${v.videoName || 'video'}.mp4`;
+                     const safeUrl = v.videoUrl.replace(/'/g, "\\'");
+                     const safeName = downloadName.replace(/'/g, "\\'");
+
+                     card.innerHTML = `
+                        <div class="video-container-styled bg-black rounded-t-xl overflow-hidden relative z-0">
+                            ${mediaHtml}
+                        </div>
+                        
+                        <div class="p-4 flex flex-col flex-grow bg-slate-900 relative z-10 border-t border-slate-800">
+                            <div class="flex justify-between items-start mb-4">
+                                <h4 class="text-white font-bold truncate pr-2 text-sm leading-tight" title="${v.videoName}">${v.videoName || 'Sem título'}</h4>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded border ${statusBg}">${statusText}</span>
+                            </div>
+
+                            <div class="mt-auto grid grid-cols-4 gap-2">
+                                <button class="col-span-1 btn-styled btn-download rounded-lg hover:bg-slate-700 transition-colors" onclick="window.forceDownload('${safeUrl}', '${safeName}')" title="Baixar Arquivo Original">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                </button>
+
+                                ${v.videoStatus !== 'approved' ? `
+                                    <button class="col-span-2 btn-styled btn-ajuste request-adjust-btn text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white border border-slate-600">
+                                        ${v.videoStatus === 'adjusted' ? 'Solicitar Novo Ajuste' : 'Solicitar Ajuste'}
+                                    </button>
+                                    <button class="col-span-1 btn-styled btn-aprovar approve-video-btn text-xs font-bold bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-900/20">Aprovar</button>
+                                ` : `
+                                    <button class="col-span-3 btn-styled btn-undo-styled undo-video-approval-btn text-xs border border-slate-700 hover:bg-slate-800 rounded-lg text-slate-400">Desfazer Aprovação</button>
+                                `}
+                            </div>
+                        </div>
+                     `;
+                     
+                     // Listeners
+                     if(v.videoStatus !== 'approved') {
+                         card.querySelector('.approve-video-btn').onclick = () => openFeedbackModal('video', pid, vid);
+                         card.querySelector('.request-adjust-btn').onclick = () => openAdjustModal(pid, vid, v.videoUrl, v.videoName, groupName);
+                     } else {
+                         card.querySelector('.undo-video-approval-btn').onclick = () => {
+                             showModal('Atenção', 'Cancelar aprovação?', true, async () => {
+                                 await updateDoc(doc(db, 'clients', cid, 'projects', pid, 'videos', vid), { videoStatus: 'pending', clientRating: deleteField(), clientFeedback: deleteField() });
+                             });
+                         };
+                     }
+                     
+                     grid.appendChild(card);
+
+                     if (isNativeVideo) {
+                         setTimeout(() => {
+                             const el = document.getElementById(uniqueId);
+                             if (el) {
+                                 new Plyr(el, {
+                                     controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                                     hideControls: false,
+                                     clickToPlay: true,
+                                     resetOnEnd: true
+                                 });
+                             }
+                         }, 50);
+                     }
+                });
+                cont.appendChild(grid);
+            });
+        }
+
+        function openProjectDetails(cid, pid, pData) {
+            currentOpenedProjectId = pid;
+            currentNavLevel = 'project_subfolders';
+            
+            document.getElementById('client-folders-view').classList.add('hidden');
+            document.getElementById('client-project-details-view').classList.remove('hidden');
+            document.getElementById('project-subfolders-list').classList.remove('hidden');
+            document.getElementById('project-group-videos').classList.add('hidden');
+            
+            document.getElementById('detail-project-name').textContent = pData.projectName;
+            document.getElementById('detail-project-date').textContent = pData.projectDate || '';
+            updateProjectActions(pid, pData.projectStatus);
+            
+            const dl = document.getElementById('detail-download-container');
+            dl.innerHTML = pData.projectDownloadUrl ? `<a href="${pData.projectDownloadUrl}" target="_blank" class="inline-flex items-center gap-2 text-sm font-bold text-blue-400 hover:text-blue-300 bg-blue-500/10 border border-blue-500/30 px-4 py-2 rounded-lg">Baixar</a>` : '';
+
+            const subGrid = document.getElementById('project-subfolders-list');
+            subGrid.innerHTML = '<p class="col-span-full text-center text-slate-500">Carregando pastas...</p>';
+            
+            if(window.currentVideoUnsubscribe) window.currentVideoUnsubscribe();
+            const q = query(collection(db, 'clients', cid, 'projects', pid, 'videos'));
+            window.currentVideoUnsubscribe = onSnapshot(q, (snap) => {
+                 const groups = {};
+                 const predefined = pData.subfolders || [];
+                 const allKeys = ['Geral', ...predefined];
+                 allKeys.forEach(k => groups[k] = 0);
+                 
+                 snap.forEach(d => {
+                     const g = d.data().groupName || 'Geral';
+                     const target = allKeys.includes(g) ? g : 'Geral';
+                     groups[target] = (groups[target] || 0) + 1;
+                 });
+                 
+                 subGrid.innerHTML = '';
+                 [...new Set(allKeys)].forEach(gName => {
+                      const count = groups[gName] || 0;
+                      const card = document.createElement('div');
+                      card.className = 'subfolder-card';
+                      card.innerHTML = `<svg class="subfolder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg><h4 class="subfolder-name">${gName}</h4><span class="subfolder-count">${count} itens</span>`;
+                      card.onclick = () => openSubfolderVideos(cid, pid, gName);
+                      subGrid.appendChild(card);
+                 });
+            });
+        }
+
+        function loadClientProjects(clientId) {
+            const c = document.getElementById('client-folders-grid');
+            onSnapshot(query(collection(db, 'clients', clientId, 'projects'), orderBy('createdAt', 'desc')), (snap) => {
+                c.innerHTML='';
+                if(snap.empty) { c.innerHTML='<p class="text-center py-12 text-slate-500">Nenhum projeto encontrado.</p>'; return; }
+                
+                snap.forEach(d => {
+                    const p = d.data();
+                    const div = document.createElement('div'); 
+                    div.className='folder-list-item group'; // Adicionei 'group' para hover effects
+                    
+                    // Verifica se tem imagem de capa (upload do admin)
+                    const hasCover = p.projectImage && p.projectImage.trim() !== '';
+                    
+                    // HTML Condicional: Imagem ou Ícone
+                    const iconHtml = hasCover 
+                        ? `<img src="${p.projectImage}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Capa">`
+                        : `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>`;
+
+                    div.innerHTML = `
+                        <div class="folder-icon-container overflow-hidden relative shadow-md border border-slate-700/50">
+                            ${iconHtml}
+                        </div>
+                        <div class="folder-info">
+                            <div class="folder-title group-hover:text-blue-400 transition-colors">${p.projectName}</div>
+                            <div class="folder-meta">
+                                <span>${p.projectDate||'Sem data'}</span>
+                                <span class="w-1 h-1 bg-slate-600 rounded-full"></span>
+                                <span class="${p.projectStatus==='approved'?'text-green-400':'text-blue-400'} text-xs uppercase font-bold tracking-wider">
+                                    ${p.projectStatus==='approved'?'Aprovado':'Em andamento'}
+                                </span>
+                            </div>
+                        </div>
+                        <svg class="w-5 h-5 folder-arrow group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    `;
+                    div.onclick = () => openProjectDetails(clientId, d.id, p);
+                    c.appendChild(div);
+                });
+            }, (error) => { console.error(error); c.innerHTML='<p class="text-center py-12 text-red-500">Erro ao carregar projetos.</p>'; });
+        }
+
+        // --- Feedback Logic ---
+        function updateFeedbackUI() {
+            const feedbackSlider = document.getElementById('feedback-rating-slider');
+            const feedbackValue = document.getElementById('feedback-rating-value');
+            const feedbackEmoji = document.getElementById('feedback-emoji-display');
+            
+            if (!feedbackSlider || !feedbackValue || !feedbackEmoji) return;
+
+            const emojis = ['🤬','😡','😭','😩','🙁','😐','🙂','😊','😃','🤩','🥳'];
+            const colors = ['#ef4444', '#ef4444', '#f97316', '#f97316', '#eab308', '#eab308', '#84cc16', '#84cc16', '#22c55e', '#22c55e', '#10b981'];
+
+            const val = parseInt(feedbackSlider.value);
+            feedbackValue.textContent = val;
+            feedbackEmoji.textContent = emojis[val];
+            feedbackSlider.style.accentColor = colors[val];
+        }
+
+        let currentApprovalTarget = null;
+        function openFeedbackModal(type, projectId, videoId=null) {
+            const feedbackSlider = document.getElementById('feedback-rating-slider');
+            const feedbackModal = document.getElementById('feedback-modal');
+            currentApprovalTarget = { type, projectId, videoId };
+            if(feedbackSlider) { feedbackSlider.value = 10; updateFeedbackUI(); }
+            if(feedbackModal) feedbackModal.classList.remove('hidden');
+        }
+
+        // --- Chat Logic ---
+        function setupChatListeners(clientId) {
+            const chatRef = doc(db, 'chats', clientId);
+            const msgsRef = collection(db, 'chats', clientId, 'messages');
+            const modal = document.getElementById('chat-modal');
+            const preScreen = document.getElementById('chat-pre-screen');
+            const liveScreen = document.getElementById('chat-live-screen');
+            const emptyStateBtn = document.getElementById('chat-empty-state-btn');
+            const sendForm = document.getElementById('chat-send-form');
+            
+            const openChat = () => {
+                modal.classList.remove('hidden');
+                getDoc(chatRef).then(snap => {
+                    const d = snap.data();
+                    if (snap.exists() && d.clientName && d.clientPhone && d.clientSubject) {
+                        preScreen.classList.add('hidden'); liveScreen.classList.remove('hidden'); liveScreen.classList.add('flex');
+                        document.getElementById('chat-new-btn').classList.remove('hidden');
+                        updateDoc(chatRef, { clientHasUnread: false }).catch(e=>{});
+                    } else {
+                        preScreen.classList.remove('hidden'); liveScreen.classList.add('hidden');
+                        document.getElementById('chat-new-btn').classList.add('hidden');
+                        if (snap.exists()) {
+                            if(d.clientName) document.getElementById('chat-name').value=d.clientName;
+                            if(d.clientPhone) document.getElementById('chat-phone').value=d.clientPhone;
+                        } else if(currentLoggedInClientName) {
+                            document.getElementById('chat-name').value = currentLoggedInClientName;
+                        }
+                    }
+                });
+            };
+            
+            document.getElementById('chat-navbar-button').onclick=openChat;
+            document.getElementById('chat-mobile-button').onclick=openChat;
+            document.getElementById('chat-close-modal-main').onclick=()=>{ modal.classList.add('hidden'); document.getElementById('chat-unread-badge').classList.add('hidden'); };
+            
+            const startNew = () => {
+                 showModal("Nova Conversa", "Iniciar novo atendimento?", true, () => {
+                     liveScreen.classList.add('hidden'); preScreen.classList.remove('hidden');
+                     document.getElementById('chat-new-btn').classList.add('hidden');
+                     document.getElementById('chat-subject').value='';
+                 });
+            };
+            document.getElementById('chat-new-btn').onclick=startNew;
+            document.getElementById('btn-start-fresh-chat').onclick=startNew;
+
+            document.getElementById('chat-pre-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const n = document.getElementById('chat-name').value.trim();
+                const p = document.getElementById('chat-phone').value.trim();
+                const s = document.getElementById('chat-subject').value.trim();
+                if(!n || !p || !s) return showModal("Atenção", "Preencha todos os campos.", false);
+                
+                await setDoc(chatRef, { clientName: n, clientPhone: p, clientSubject: s, adminHasUnread: true, clientHasUnread: false, createdAt: serverTimestamp() }, {merge: true});
+                await addDoc(msgsRef, { text: `Olá! Assunto: ${s}`, sender: 'client', createdAt: serverTimestamp() });
+                preScreen.classList.add('hidden'); liveScreen.classList.remove('hidden'); liveScreen.classList.add('flex');
+                document.getElementById('chat-new-btn').classList.remove('hidden');
+            };
+
+            sendForm.onsubmit = async (e) => {
+                e.preventDefault();
+                const inp = document.getElementById('chat-message-input');
+                const txt = inp.value.trim();
+                if(!txt) return;
+                inp.value='';
+                await addDoc(msgsRef, { text: txt, sender: 'client', createdAt: serverTimestamp() });
+                await updateDoc(chatRef, { adminHasUnread: true });
+            };
+
+            onSnapshot(query(msgsRef), (snap) => {
+                const msgsDiv = document.getElementById('chat-messages-div');
+                msgsDiv.innerHTML = '';
+                const msgs = [];
+                snap.forEach(d => msgs.push({ ...d.data(), createdAt: d.data().createdAt?.toDate().getTime()||0 }));
+                msgs.sort((a,b) => a.createdAt - b.createdAt);
+                
+                if(msgs.length === 0) {
+                    emptyStateBtn.classList.remove('hidden');
+                    sendForm.classList.add('hidden'); 
+                } else {
+                    emptyStateBtn.classList.add('hidden');
+                    sendForm.classList.remove('hidden');
+                    msgs.forEach(m => {
+                        const d = document.createElement('div');
+                        d.className = `chat-bubble ${m.sender==='client'?'chat-bubble-client':(m.sender==='admin'?'chat-bubble-admin':'chat-bubble-system')}`;
+                        d.textContent = m.text;
+                        msgsDiv.appendChild(d);
+                    });
+                    const c = document.getElementById('chat-messages-container');
+                    setTimeout(()=> c.scrollTop = c.scrollHeight, 100);
+                }
+            });
+            
+            onSnapshot(chatRef, (snap) => {
+                if(snap.exists()) {
+                    const d = snap.data();
+                    const b = document.getElementById('chat-unread-badge');
+                    if(b) d.clientHasUnread ? b.classList.remove('hidden') : b.classList.add('hidden');
+                    const typ = document.getElementById('admin-typing-indicator');
+                    const on = document.getElementById('admin-online-status');
+                    if(typ && on) {
+                         if(d.adminIsTyping) { typ.classList.remove('hidden'); on.classList.add('hidden'); }
+                         else { typ.classList.add('hidden'); on.classList.remove('hidden'); }
+                    }
+                }
+            });
+        }
+
+        // --- Public Site Functions ---
+        function setupCarousel() {
+            const wrap = document.getElementById('carousel-slides-wrapper');
+            const dots = document.getElementById('carousel-dots-container');
+            if (!wrap || !dots) return;
+            
+            try {
+                onSnapshot(query(collection(db, 'carouselItems'), where('isActive', '!=', false)), (snap) => {
+                    wrap.innerHTML=''; dots.innerHTML='';
+                    const items=[]; snap.forEach(d=>items.push(d.data()));
+                    document.getElementById('loading-carousel').classList.add('hidden');
+                    if(items.length===0) { wrap.innerHTML='<div class="w-full h-full flex items-center justify-center text-slate-500">Sem destaques</div>'; document.getElementById('carousel-section').style.height='30vh'; return; }
+                    document.getElementById('carousel-section').style.height='60vh';
+                    items.forEach((item,i) => {
+                        const s = document.createElement('div'); s.className=`carousel-slide ${i===0?'active':''}`; s.innerHTML=getMediaHtml(item.url, item.type, true);
+                        wrap.appendChild(s);
+                        const d = document.createElement('div'); d.className=`carousel-dot ${i===0?'active':''}`; d.onclick=()=>setSlide(i); dots.appendChild(d);
+                    });
+                    startSlideInterval(items.length);
+                }, (error) => {
+                    console.error("Erro ao carregar carrossel:", error);
+                    const loading = document.getElementById('loading-carousel');
+                    if(loading) loading.classList.add('hidden');
+                    wrap.innerHTML='<div class="w-full h-full flex items-center justify-center text-red-500">Erro ao carregar destaques</div>';
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        // --- 1. Função Atualizada: Troca de Slide (COM AUTOPLAY CORRIGIDO) ---
+        function setSlide(i) {
+            const slides = document.querySelectorAll('.carousel-slide'); 
+            const dots = document.querySelectorAll('.carousel-dot');
+            
+            if(slides.length === 0) return; 
+            
+            // Pausa todos os vídeos (background) antes de mudar
+            stopBackgroundVideos(); 
+            
+            // Calcula índice
+            currentSlideIndex = i; 
+            if(i >= slides.length) currentSlideIndex = 0; 
+            if(i < 0) currentSlideIndex = slides.length - 1;
+            
+            // Atualiza classes active
+            slides.forEach((s, idx) => s.classList.toggle('active', idx === currentSlideIndex));
+            dots.forEach((d, idx) => d.classList.toggle('active', idx === currentSlideIndex));
+
+            // --- NOVO: Força o Play no vídeo do slide atual ---
+            const activeSlide = slides[currentSlideIndex];
+            const video = activeSlide.querySelector('video');
+            const iframe = activeSlide.querySelector('iframe');
+
+            if (video) {
+                video.currentTime = 0; 
+                video.play().catch(e => console.log("Autoplay bloqueado:", e)); 
+            } else if (iframe) {
+                // Tenta postMessage para youtube/vimeo
+                iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                iframe.contentWindow.postMessage('{"method":"play"}', '*');
+            }
+
+            // Reinicia timer (15s)
+            startSlideInterval(slides.length);
+        }
+
+        window.prevSlide = function(){ setSlide(currentSlideIndex-1); };
+        window.nextSlide = function(){ setSlide(currentSlideIndex+1); };
+        
+        // --- 2. Função Atualizada: Timer de 15 Segundos ---
+        function startSlideInterval(l) { 
+            if(slideInterval) clearInterval(slideInterval); 
+            if(l > 1) {
+                slideInterval = setInterval(() => setSlide(currentSlideIndex + 1), 15000); // 15 segundos
+            }
+        }
+
+        function setupGallery() {
+            const c = document.getElementById('gallery-container');
+            if (!c) return;
+            try {
+                onSnapshot(query(collection(db, 'galleryItems'), where('isActive', '!=', false)), (snap) => {
+                    c.innerHTML=''; const items=[]; snap.forEach(d=>items.push({...d.data()}));
+                    if(items.length===0) { c.innerHTML='<p class="text-center py-8 text-slate-500">Vazia</p>'; return; }
+                    items.sort((a,b)=> (a.orderNumber||0)-(b.orderNumber||0));
+                    const track = document.createElement('div'); track.className='flex gap-6 animate-marquee w-max hover:pause';
+                    const createCard = (data) => {
+                        const d = document.createElement('div'); d.className='gallery-item-card border border-slate-700 hover:border-blue-500 rounded-xl overflow-hidden relative shadow-lg';
+                        d.style.width='450px'; d.style.height='280px';
+                        d.innerHTML = getMediaHtml(data.url, data.type, true).replace('object-contain','object-cover');
+                        const v = d.querySelector('video'); if(v){ v.removeAttribute('controls'); v.style.pointerEvents='none'; }
+                        d.onclick=()=>openGalleryExpandModal(data.url, data.type);
+                        return d;
+                    };
+                    items.forEach(i=>track.appendChild(createCard(i))); items.forEach(i=>track.appendChild(createCard(i)));
+                    c.appendChild(track);
+                }, (error) => { console.error("Erro galeria:", error); });
+            } catch (e) { console.error(e); }
+        }
+
+        function openGalleryExpandModal(url, type) {
+            stopBackgroundVideos();
+            document.getElementById('gallery-expand-modal').classList.remove('hidden');
+            const con = document.getElementById('gallery-expanded-media');
+            con.innerHTML = getMediaHtml(url, type, false);
+            const v = con.querySelector('video'); if(v) v.controls=true;
+        }
+
+        // ============================================================================
+        // 3. EVENT LISTENERS (GROUPED)
+        // ============================================================================
+        
+        // Login Listeners
+        document.getElementById('login-evento-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id=document.getElementById('evento-id').value.trim();
+            const pass=document.getElementById('evento-senha').value.trim();
+            const remember=document.getElementById('remember-me').checked;
+            const btn=document.getElementById('login-submit-btn');
+            
+            if(!id || !pass) return;
+            btn.disabled=true;
+            try {
+                const snap = await getDoc(doc(db, 'clients', id));
+                
+                // Se existe e senha confere
+                if(snap.exists() && snap.data().password === pass) {
+                     const clientData = snap.data(); // Defino aqui para garantir
+                     currentLoggedInClientId = id; 
+                     currentLoggedInClientName = clientData.clientName;
+                     
+                     if(remember) { localStorage.setItem(LS_ID_KEY, id); localStorage.setItem(LS_PASS_KEY, pass); } 
+                     else { localStorage.removeItem(LS_ID_KEY); localStorage.removeItem(LS_PASS_KEY); }
+                     
+                     document.getElementById('login-evento').classList.add('hidden');
+                     document.getElementById('galeria').classList.add('hidden');
+                     document.getElementById('client-portal-section').classList.remove('hidden');
+                     document.getElementById('client-portal-section').scrollIntoView({behavior:'smooth'});
+                     
+                     document.getElementById('chat-navbar-button').classList.remove('hidden');
+                     document.getElementById('chat-mobile-button').classList.remove('hidden');
+                     
+                     loadClientProjects(id);
+                     setupChatListeners(id);
+                     
+                     // --- ATUALIZAÇÃO: LOGO E TÍTULO DO CLIENTE ---
+                     document.getElementById('welcome-title').textContent = `Olá, ${currentLoggedInClientName}!`;
+                     document.getElementById('client-portal-title').textContent = currentLoggedInClientName;
+                     
+                     // Lógica para exibir o Logo do Cliente (se houver upload)
+                     const logoBox = document.getElementById('client-portal-logo');
+                     if (clientData.clientLogo && clientData.clientLogo.trim() !== '') {
+                         logoBox.innerHTML = ''; // Remove o texto "cli"
+                         logoBox.style.backgroundImage = `url('${clientData.clientLogo}')`;
+                         logoBox.style.backgroundColor = 'transparent'; // Fundo transparente para PNGs
+                         logoBox.classList.remove('border'); // Remove borda se preferir visual limpo
+                     } else {
+                         // Reset para padrão se não tiver logo
+                         logoBox.innerHTML = '<span class="text-slate-500">cli</span>';
+                         logoBox.style.backgroundImage = '';
+                         logoBox.style.backgroundColor = '#1e293b';
+                     }
+                     // ----------------------------------------------
+
+                     document.getElementById('welcome-message-box').classList.remove('hidden');
+                } else {
+                    document.getElementById('login-message').style.opacity='1';
+                    document.getElementById('login-message').textContent = "Dados incorretos.";
+                }
+            } catch(e) { console.error("Erro no login:", e); } finally { btn.disabled=false; }
+        });
+
+        document.querySelectorAll('.toggle-password-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const input = btn.previousElementSibling;
+                if(input.type === 'password') { input.type = 'text'; btn.classList.add('toggled'); } 
+                else { input.type = 'password'; btn.classList.remove('toggled'); }
+            });
+        });
+
+        // Adjustment Listeners
+        const commentForm = document.getElementById('ajuste-comment-form');
+        if (commentForm) {
+            commentForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(!currentAdjustData) return;
+                const tsInput = document.getElementById('ajuste-timestamp-input');
+                const txtInput = document.getElementById('ajuste-comment-text');
+                const printImg = document.getElementById('ajuste-print-preview');
+                
+                const timestamp = tsInput.value.trim() || 'Geral';
+                const comment = txtInput.value.trim();
+                
+                // Pega o print se estiver visível
+                const printContainer = document.getElementById('print-preview-container');
+                const printBase64 = (!printContainer.classList.contains('hidden') && printImg.src) ? printImg.src : null;
+
+                if(!comment) return;
+
+                const { pid, vid } = currentAdjustData;
+                const ref = doc(db, 'clients', currentLoggedInClientId, 'projects', pid, 'videos', vid);
+                
+                try {
+                    const snap = await getDoc(ref);
+                    if(snap.exists()) {
+                        let adjustments = snap.data().adjustments || [];
+                        const newAdjustment = { 
+                            timestamp, 
+                            comment, 
+                            print: printBase64, // Salva o print
+                            createdAt: new Date().toISOString() 
+                        };
+
+                        if(editingAdjustmentIndex > -1) {
+                             adjustments[editingAdjustmentIndex] = newAdjustment;
+                             document.getElementById('cancel-edit-mode-btn').click();
+                        } else {
+                             adjustments.push(newAdjustment);
+                        }
+                        await updateDoc(ref, { adjustments }); 
+                        
+                        // Limpa
+                        txtInput.value = ''; 
+                        tsInput.value = '';
+                        document.getElementById('print-preview-container').classList.add('hidden');
+                        document.getElementById('ajuste-print-preview').src = '';
+                    }
+                } catch(e) { console.error(e); showModal('Erro', 'Falha ao salvar comentário.', false); }
+            });
+        }
+
+        const cancelEditBtn = document.getElementById('cancel-edit-mode-btn');
+        if (cancelEditBtn) {
+            cancelEditBtn.addEventListener('click', () => {
+                editingAdjustmentIndex = -1;
+                document.getElementById('edit-mode-indicator').classList.add('hidden');
+                const btn = document.getElementById('add-adjustment-btn');
+                btn.innerText = 'Adicionar'; btn.className = "flex-grow bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-3 rounded-lg";
+                document.getElementById('ajuste-comment-form').reset();
+            });
+        }
+
+        const submitFinalBtn = document.getElementById('submit-final-adjustments');
+        if (submitFinalBtn) {
+            submitFinalBtn.addEventListener('click', () => {
+                 if(!currentAdjustData) return;
+                 const { pid, vid } = currentAdjustData;
+                 showModal('Concluir', 'Confirmar envio dos ajustes? A equipe será notificada e o vídeo ficará com status "Em Ajuste".', true, async () => {
+                     try {
+                         const ref = doc(db, 'clients', currentLoggedInClientId, 'projects', pid, 'videos', vid);
+                         await updateDoc(ref, { videoStatus: 'adjusting', lastUpdated: serverTimestamp() });
+                         document.getElementById('sidebar-back-btn').click();
+                         showModal('Sucesso', 'Ajustes enviados para a equipe.');
+                     } catch(e) {
+                         console.error(e);
+                         showModal('Erro', 'Falha ao enviar.', false);
+                     }
+                 });
+            });
+        }
+
+        // Navigation Listeners
+        document.getElementById('client-portal-back-button').onclick = () => showModal("Sair", "Deseja sair?", true, () => { localStorage.removeItem(LS_ID_KEY); localStorage.removeItem(LS_PASS_KEY); location.reload(); });
+        
+        document.getElementById('back-to-folders-btn').onclick = () => {
+            if (currentNavLevel === 'subfolder_videos') {
+                 getDoc(doc(db, 'clients', currentLoggedInClientId, 'projects', currentOpenedProjectId)).then(snap => {
+                     openProjectDetails(currentLoggedInClientId, currentOpenedProjectId, snap.data());
+                 });
+            } else {
+                 document.getElementById('client-project-details-view').classList.add('hidden');
+                 document.getElementById('client-folders-view').classList.remove('hidden');
+                 currentNavLevel = 'projects_root';
+                 if(window.currentVideoUnsubscribe) window.currentVideoUnsubscribe();
+            }
+        };
+
+        const sidebarCloseBtn = document.getElementById('sidebar-back-btn');
+        if (sidebarCloseBtn) {
+            sidebarCloseBtn.addEventListener('click', () => {
+                const modal = document.getElementById('video-ajuste-modal');
+                if(modal) modal.classList.add('hidden');
+                const player = document.getElementById('ajuste-player-container');
+                if(player) player.innerHTML = '';
+                stopBackgroundVideos(); 
+                
+                const videoSec = document.getElementById('ajuste-video-section');
+                const mobileBtn = document.getElementById('mobile-toggle-video-btn');
+                if(videoSec) videoSec.classList.remove('hidden-mobile-video');
+                if(mobileBtn) mobileBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> Ocultar Vídeo';
+            });
+        }
+
+        const mobileToggleVideoBtn = document.getElementById('mobile-toggle-video-btn');
+        if (mobileToggleVideoBtn) {
+            mobileToggleVideoBtn.addEventListener('click', () => {
+                const videoSection = document.getElementById('ajuste-video-section');
+                const btn = document.getElementById('mobile-toggle-video-btn');
+                
+                if (videoSection.classList.contains('hidden-mobile-video')) {
+                    videoSection.classList.remove('hidden-mobile-video');
+                    btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> Ocultar Vídeo';
+                } else {
+                    videoSection.classList.add('hidden-mobile-video');
+                    btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Ver Vídeo';
+                    stopBackgroundVideos();
+                }
+            });
+        }
+        
+        const feedbackSlider = document.getElementById('feedback-rating-slider');
+        if (feedbackSlider) feedbackSlider.addEventListener('input', updateFeedbackUI);
+        // --- LÓGICA DOS BOTÕES DO MODAL DE FEEDBACK (CANCELAR E CONFIRMAR) ---
+        const feedbackCancelBtn = document.getElementById('feedback-cancel-btn');
+        const feedbackConfirmBtn = document.getElementById('feedback-confirm-btn');
+
+        // 1. Botão Cancelar: Apenas fecha o modal e limpa o texto
+        if (feedbackCancelBtn) {
+            feedbackCancelBtn.addEventListener('click', () => {
+                document.getElementById('feedback-modal').classList.add('hidden');
+                document.getElementById('feedback-comment').value = ''; // Limpa o campo
+            });
+        }
+
+        // 2. Botão Confirmar: Salva a aprovação no Firebase
+        if (feedbackConfirmBtn) {
+            feedbackConfirmBtn.addEventListener('click', async () => {
+                if (!currentApprovalTarget) return;
+
+                // Muda texto do botão para indicar processamento
+                const originalText = feedbackConfirmBtn.innerText;
+                feedbackConfirmBtn.innerText = "Enviando...";
+                feedbackConfirmBtn.disabled = true;
+
+                const rating = document.getElementById('feedback-rating-slider').value;
+                const comment = document.getElementById('feedback-comment').value;
+                const { type, projectId, videoId } = currentApprovalTarget;
+
+                try {
+                    if (type === 'video') {
+                        // Aprova Vídeo Individual
+                        const videoRef = doc(db, 'clients', currentLoggedInClientId, 'projects', projectId, 'videos', videoId);
+                        await updateDoc(videoRef, {
+                            videoStatus: 'approved',
+                            clientRating: rating,
+                            clientFeedback: comment,
+                            lastUpdated: serverTimestamp()
+                        });
+                    } else if (type === 'project') {
+                        // Aprova Projeto Completo
+                        const projectRef = doc(db, 'clients', currentLoggedInClientId, 'projects', projectId);
+                        
+                        // Atualiza status do projeto
+                        await updateDoc(projectRef, {
+                            projectStatus: 'approved',
+                            clientRating: rating,
+                            clientFeedback: comment,
+                            lastUpdated: serverTimestamp()
+                        });
+
+                        // Opcional: Marca todos os vídeos dentro como aprovados também
+                        const videosSnapshot = await getDocs(collection(db, 'clients', currentLoggedInClientId, 'projects', projectId, 'videos'));
+                        const batch = writeBatch(db);
+                        videosSnapshot.forEach(vDoc => {
+                            batch.update(vDoc.ref, { videoStatus: 'approved', lastUpdated: serverTimestamp() });
+                        });
+                        await batch.commit();
+                        
+                        // Atualiza a barra de status no topo da tela (se estiver visível)
+                        updateProjectActions(projectId, 'approved');
+                    }
+                    
+                    // Fecha o modal
+                    document.getElementById('feedback-modal').classList.add('hidden');
+                    document.getElementById('feedback-comment').value = '';
+                    
+                    // Feedback visual simples para o cliente
+                    // (Você pode substituir por um showModal customizado se preferir)
+                    alert('Sucesso! Sua aprovação foi registrada.');
+
+                } catch (e) {
+                    console.error("Erro ao aprovar:", e);
+                    alert("Ocorreu um erro ao enviar a aprovação. Tente novamente.");
+                } finally {
+                    // Restaura o botão
+                    feedbackConfirmBtn.innerText = originalText;
+                    feedbackConfirmBtn.disabled = false;
+                }
+            });
+        }
+
+        document.getElementById('close-gallery-expand-btn').onclick = () => {
+             document.getElementById('gallery-expand-modal').classList.add('hidden');
+             document.getElementById('gallery-expanded-media').innerHTML = '';
+             stopBackgroundVideos();
+        };
+
+        // ============================================================================
+        // 4. INITIALIZATION
+        // ============================================================================
+        
+        signInAnonymously(auth).then(() => {
+            console.log("Firebase Auth Initialized");
+            loadSiteConfig();
+            setupCarousel();
+            setupGallery();
+            initializeLoginFields(); 
+        }).catch(console.error);
+
+        window.openAdjustModal = openAdjustModal;
+
+        // --- FUNÇÃO DE NOTIFICAÇÃO VISUAL (TOAST) ---
+        function showClientToast(title, message, type = 'info') {
+            const container = document.getElementById('client-toast-container');
+            if(!container) return;
+
+            const el = document.createElement('div');
+            
+            // Define cores e ícones baseados no tipo
+            let borderClass = '';
+            let iconHtml = '';
+            
+            if (type === 'success') {
+                borderClass = 'toast-success'; // Verde
+                iconHtml = `<div class="bg-green-500/20 p-2 rounded-full text-green-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>`;
+            } else if (type === 'chat') {
+                borderClass = 'toast-chat'; // Amarelo
+                iconHtml = `<div class="bg-yellow-500/20 p-2 rounded-full text-yellow-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg></div>`;
+            } else {
+                borderClass = ''; // Azul (Info)
+                iconHtml = `<div class="bg-blue-500/20 p-2 rounded-full text-blue-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>`;
+            }
+
+            el.className = `toast-card ${borderClass} p-4 flex items-start gap-3`;
+            el.innerHTML = `
+                <div class="flex-shrink-0">${iconHtml}</div>
+                <div class="flex-grow">
+                    <h4 class="text-white font-bold text-sm leading-tight mb-1">${title}</h4>
+                    <p class="text-slate-300 text-xs leading-relaxed">${message}</p>
+                </div>
+                <button class="text-slate-500 hover:text-white" onclick="this.parentElement.remove()">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            `;
+
+            container.appendChild(el);
+            
+            // Som suave para o toast visual
+            const softPop = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"); // Som curto placeholder ou pode usar o notificationSound
+            
+            // Remove automático após 5 segundos
+            setTimeout(() => {
+                el.style.animation = 'fadeOutToast 0.5s forwards';
+                setTimeout(() => el.remove(), 500);
+            }, 5000);
+        }
+
+        // --- LISTENERS DE NOTIFICAÇÃO (ATUALIZADO COM TOAST) ---
+        function setupNotificationListeners(clientId) {
+            console.log("Iniciando sistema de notificações para:", clientId);
+
+            // 1. Monitorar Mensagens do Chat (Admin -> Cliente)
+            const msgsQuery = query(collection(db, 'chats', clientId, 'messages'), orderBy('createdAt', 'desc'), where('sender', '==', 'admin'));
+            
+            onSnapshot(msgsQuery, (snap) => {
+                snap.docChanges().forEach((change) => {
+                    if (change.type === "added") {
+                        const data = change.doc.data();
+                        const safeStartTime = new Date(sessionStartTime.getTime() - 10000);
+                        const msgDate = data.createdAt ? data.createdAt.toDate() : new Date();
+                        
+                        if (msgDate > safeStartTime) {
+                            // Dispara as duas notificações
+                            sendBrowserNotification("Nova Mensagem do Suporte", data.text);
+                            showClientToast("Mensagem do Suporte", data.text, "chat");
+                        }
+                    }
+                });
+            });
+
+            // 2. Monitorar Projetos e Vídeos
+            const projectsRef = collection(db, 'clients', clientId, 'projects');
+            
+            onSnapshot(projectsRef, (projSnap) => {
+                projSnap.forEach(projDoc => {
+                    const videosRef = collection(db, 'clients', clientId, 'projects', projDoc.id, 'videos');
+                    
+                    onSnapshot(videosRef, (videoSnap) => {
+                        videoSnap.docChanges().forEach((change) => {
+                            const data = change.doc.data();
+                            
+                            // Se um vídeo foi modificado (Ex: status mudou para 'adjusted')
+                            if (change.type === "modified") {
+                                if (data.videoStatus === 'adjusted') {
+                                    if (!videoSnap.metadata.hasPendingWrites) {
+                                        const title = "✅ Ajuste Finalizado!";
+                                        const body = `O vídeo "${data.videoName}" foi ajustado e está pronto.`;
+                                        
+                                        sendBrowserNotification(title, body);
+                                        showClientToast(title, body, "success");
+                                    }
+                                }
+                            }
+                            
+                            // Se um vídeo novo foi adicionado
+                            if (change.type === "added") {
+                                const created = data.createdAt ? data.createdAt.toDate() : new Date();
+                                if (created > sessionStartTime) {
+                                    const title = "🎥 Novo Vídeo";
+                                    const body = `"${data.videoName}" foi adicionado ao projeto.`;
+                                    
+                                    sendBrowserNotification(title, body);
+                                    showClientToast(title, body, "info");
+                                }
+                            }
+                        });
+                    });
+                });
+            });
+        }
+        // --- FUNÇÃO PARA FORÇAR DOWNLOAD ---
+        window.forceDownload = async (url, filename) => {
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>`; 
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Erro rede');
+                
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename || 'video-download.mp4';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(blobUrl);
+            } catch (e) {
+                console.warn("Download direto falhou, abrindo nova aba", e);
+                window.open(url, '_blank');
+            } finally {
+                btn.innerHTML = originalText;
+            }
+        };
+    </script>
+    <div id="client-toast-container" class="fixed top-24 right-4 z-[300] flex flex-col gap-3 pointer-events-none"></div>
+</body>
+</html>
