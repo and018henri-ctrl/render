@@ -1782,11 +1782,14 @@
         // --- SISTEMA DE GERENCIAMENTO DE DOWNLOADS ---
         window.activeDownloads = {}; // Guarda os "freios" de cada download
 
-        // Salva e recupera o histórico na memória do navegador
+       // Salva e recupera o histórico na memória do navegador de forma ISOLADA por cliente
         window.updateHistoryUI = () => {
             const list = document.getElementById('downloads-history-list');
             if(!list) return;
-            const history = JSON.parse(localStorage.getItem('am_downloads_history') || '[]');
+            
+            // Chave única baseada no ID do cliente para garantir privacidade
+            const clientHistoryKey = 'am_downloads_history_' + currentLoggedInClientId;
+            const history = JSON.parse(localStorage.getItem(clientHistoryKey) || '[]');
             
             if(history.length === 0) {
                 list.innerHTML = '<p class="text-center text-slate-500 text-sm mt-4">Você ainda não baixou nenhum arquivo.</p>';
@@ -1845,7 +1848,13 @@
         };
 
         function saveToHistory(vid, name, url, status) {
-            let history = JSON.parse(localStorage.getItem('am_downloads_history') || '[]');
+            // Trava de segurança: impede gravação se ninguém estiver logado
+            if (!currentLoggedInClientId) return; 
+
+            // Define a chave privada do cliente exato
+            const clientHistoryKey = 'am_downloads_history_' + currentLoggedInClientId;
+            let history = JSON.parse(localStorage.getItem(clientHistoryKey) || '[]');
+            
             const now = new Date();
             const dateStr = now.toLocaleDateString('pt-BR') + ' às ' + now.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
             
@@ -1853,7 +1862,8 @@
             history.unshift({ vid, name, url, status, dateStr }); // Bota no topo
             if(history.length > 20) history.pop(); // Guarda só os últimos 20
             
-            localStorage.setItem('am_downloads_history', JSON.stringify(history));
+            // Salva no cofre exclusivo deste cliente
+            localStorage.setItem(clientHistoryKey, JSON.stringify(history));
             updateHistoryUI();
         }
 
